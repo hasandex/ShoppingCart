@@ -9,7 +9,6 @@ namespace SoppingCart.Services
         {
             _environment = environment;
         }
-
         public string StoreImage(IFormFile formFile,string path)
         {
             var fileName = $"{Guid.NewGuid().ToString()}{Path.GetExtension(formFile.FileName)}";
