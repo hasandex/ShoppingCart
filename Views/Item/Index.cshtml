@@ -28,6 +28,7 @@ else
       <th scope="col">Category</th>
       <th scope="col">Price</th>
       <th scope="col">Cover</th>
+      <th scope="col">Actions</th>
     </tr>
   </thead>
         <tbody>
@@ -40,9 +41,11 @@ else
                     <td>
                         <img src="@($"{Settings.ItemImageStorePath}/{@item.Cover}")" class="rounded" style="width:100px;height:100px;" />
                     </td>
+                    <td>
+                        <a asp-action="Update" asp-route-id="@item.Id" class="btn btn-info rounded rounded-3 me-4"> <i class="bi bi-pencil-square"></i> </a>
+                    </td>
                 </tr>
             }
-            
         </tbody>
     </table>
 }

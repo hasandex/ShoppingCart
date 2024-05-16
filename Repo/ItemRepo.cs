@@ -4,6 +4,7 @@ using SoppingCart.Data;
 using SoppingCart.Models;
 using SoppingCart.Repo.Base;
 using SoppingCart.Services;
+using System.IO;
 
 namespace SoppingCart.Repo
 {
@@ -18,7 +19,19 @@ namespace SoppingCart.Repo
             _env = env;
             _imageService = imageService;
         }
-
+        public async Task<IEnumerable<Item>> GetAll()
+        {
+            return await _appDbContext.Items.Include(i => i.Category).AsNoTracking().ToListAsync();
+        }
+        public Item? GetById(int id)
+        {
+            var item =  _appDbContext.Items.FirstOrDefault(i => i.Id == id);
+            if (item != null)
+            {
+                return item;
+            }
+            return null;
+        }
         public int Create(CreateItemViewModel viewModel)
         {
             var item = new Item()
@@ -33,9 +46,27 @@ namespace SoppingCart.Repo
             return _appDbContext.SaveChanges();
         }
 
-        public async Task<IEnumerable<Item>> GetAll()
+        public int Update(UpdateItemViewModel viewModel)
         {
-            return await _appDbContext.Items.Include(i => i.Category).AsNoTracking().ToListAsync();
+            var item = _appDbContext.Items.FirstOrDefault(i => i.Id == viewModel.Id);
+            if (item != null)
+            {
+                if(viewModel.FormFile != null)
+                {
+                    var oldImagePath = Path.Combine($"{_env.WebRootPath}{Settings.ItemImageStorePath}",item.Cover);
+                    File.Delete(oldImagePath);
+                    item.Cover = _imageService.StoreImage(viewModel.FormFile,Settings.ItemImageStorePath);
+                }
+                item.Name = viewModel.Name;
+                item.Description = viewModel.Description;
+                item.CategoryId = viewModel.CategoryId;
+                item.Price = viewModel.Price;
+                _appDbContext.Update(item);
+                return _appDbContext.SaveChanges();
+            }
+            return 0;
         }
+
+        
     }
 }
